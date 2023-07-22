@@ -1,0 +1,343 @@
+import numpy as np
+import pandas as pd
+import os
+import seaborn as sns
+
+Görev 1: Seaborn kütüphanesi içerisinden Titanic veri setini tanımlayınız.
+  df = sns.load_dataset("titanic")
+  
+Görev 2: Titanic veri setindeki kadın ve erkek yolcuların sayısını bulunuz.
+  df.columns
+  Index(['survived', 'pclass', 'sex', 'age', 'sibsp', 'parch', 'fare',
+       'embarked', 'class', 'who', 'adult_male', 'deck', 'embark_town',
+       'alive', 'alone'],
+      dtype='object')
+  df["sex"].value_counts()
+male      577
+female    314
+Name: sex, dtype: int64
+
+Görev 3: Her bir sutuna ait unique değerlerin sayısını bulunuz.
+  df.nunique()
+Out[8]: 
+survived         2
+pclass           3
+sex              2
+age             88
+sibsp            7
+parch            7
+fare           248
+embarked         3
+class            3
+who              3
+adult_male       2
+deck             7
+embark_town      3
+alive            2
+alone            2
+dtype: int64
+
+Görev 4: pclass değişkeninin unique değerlerinin sayısını bulunuz.
+  print(df["pclass"].nunique())
+print(df["pclass"].value_counts())
+3
+3    491
+1    216
+2    184
+Name: pclass, dtype: int64
+
+Görev 5: pclass ve parch değişkenlerinin unique değerlerinin sayısını bulunuz.
+  df[["pclass","parch"]].nunique()
+Out[10]: 
+pclass    3
+parch     7
+dtype: int64
+
+Görev 6: embarked değişkeninin tipini kontrol ediniz. Tipini category olarak değiştiriniz ve tekrar kontrol ediniz.
+  df["embarked"].dtype
+Out[11]: dtype('O')
+  df["embarked"] = df["embarked"].astype("category")
+df["embarked"].info()
+<class 'pandas.core.series.Series'>
+RangeIndex: 891 entries, 0 to 890
+Series name: embarked
+Non-Null Count  Dtype   
+--------------  -----   
+889 non-null    category
+dtypes: category(1)
+memory usage: 1.1 KB
+
+Görev 7: embarked değeri C olanların tüm bilgelerini gösteriniz.
+df.loc[df["embarked"]=="C"]
+Out[14]: 
+     survived  pclass     sex   age  ...  deck  embark_town  alive  alone
+1           1       1  female  38.0  ...     C    Cherbourg    yes  False
+9           1       2  female  14.0  ...   NaN    Cherbourg    yes  False
+19          1       3  female   NaN  ...   NaN    Cherbourg    yes   True
+26          0       3    male   NaN  ...   NaN    Cherbourg     no   True
+30          0       1    male  40.0  ...   NaN    Cherbourg     no   True
+..        ...     ...     ...   ...  ...   ...          ...    ...    ...
+866         1       2  female  27.0  ...   NaN    Cherbourg    yes  False
+874         1       2  female  28.0  ...   NaN    Cherbourg    yes  False
+875         1       3  female  15.0  ...   NaN    Cherbourg    yes   True
+879         1       1  female  56.0  ...     C    Cherbourg    yes  False
+889         1       1    male  26.0  ...     C    Cherbourg    yes   True
+[168 rows x 15 columns]
+
+Görev 8: embarked değeri S olmayanların tüm bilgelerini gösteriniz.  
+df.loc[df["embarked"]!="S"]
+Out[15]: 
+     survived  pclass     sex   age  ...  deck  embark_town  alive  alone
+1           1       1  female  38.0  ...     C    Cherbourg    yes  False
+5           0       3    male   NaN  ...   NaN   Queenstown     no   True
+9           1       2  female  14.0  ...   NaN    Cherbourg    yes  False
+16          0       3    male   2.0  ...   NaN   Queenstown     no  False
+19          1       3  female   NaN  ...   NaN    Cherbourg    yes   True
+..        ...     ...     ...   ...  ...   ...          ...    ...    ...
+875         1       3  female  15.0  ...   NaN    Cherbourg    yes   True
+879         1       1  female  56.0  ...     C    Cherbourg    yes  False
+885         0       3  female  39.0  ...   NaN   Queenstown     no  False
+889         1       1    male  26.0  ...     C    Cherbourg    yes   True
+890         0       3    male  32.0  ...   NaN   Queenstown     no   True
+[247 rows x 15 columns]
+
+Görev 9: Yaşı 30 dan küçük ve kadın olan yolcuların tüm bilgilerini gösteriniz.
+df.loc[(df["age"]<30) & (df["sex"] == "female")]
+Out[16]: 
+     survived  pclass     sex   age  ...  deck  embark_town  alive  alone
+2           1       3  female  26.0  ...   NaN  Southampton    yes   True
+8           1       3  female  27.0  ...   NaN  Southampton    yes  False
+9           1       2  female  14.0  ...   NaN    Cherbourg    yes  False
+10          1       3  female   4.0  ...     G  Southampton    yes  False
+14          0       3  female  14.0  ...   NaN  Southampton     no   True
+..        ...     ...     ...   ...  ...   ...          ...    ...    ...
+874         1       2  female  28.0  ...   NaN    Cherbourg    yes  False
+875         1       3  female  15.0  ...   NaN    Cherbourg    yes   True
+880         1       2  female  25.0  ...   NaN  Southampton    yes  False
+882         0       3  female  22.0  ...   NaN  Southampton     no   True
+887         1       1  female  19.0  ...     B  Southampton    yes   True
+[147 rows x 15 columns]
+
+Görev 10: Fare'i 500'den büyük veya yaşı 70 den büyük yolcuların bilgilerini gösteriniz.
+  df.loc[(df["fare"] > 500) | (df["age"] > 70)]
+Out[17]: 
+     survived  pclass     sex   age  ...  deck  embark_town  alive  alone
+96          0       1    male  71.0  ...     A    Cherbourg     no   True
+116         0       3    male  70.5  ...   NaN   Queenstown     no   True
+258         1       1  female  35.0  ...   NaN    Cherbourg    yes   True
+493         0       1    male  71.0  ...   NaN    Cherbourg     no   True
+630         1       1    male  80.0  ...     A  Southampton    yes   True
+679         1       1    male  36.0  ...     B    Cherbourg    yes  False
+737         1       1    male  35.0  ...     B    Cherbourg    yes   True
+851         0       3    male  74.0  ...   NaN  Southampton     no   True
+[8 rows x 15 columns]
+
+Görev 11: Her bir değişkendeki boş değerlerin toplamını bulunuz.
+df.isnull().sum()
+Out[18]: 
+survived         0
+pclass           0
+sex              0
+age            177
+sibsp            0
+parch            0
+fare             0
+embarked         2
+class            0
+who              0
+adult_male       0
+deck           688
+embark_town      2
+alive            0
+alone            0
+dtype: int64
+
+Görev 12: who değişkenini dataframe’den çıkarınız.
+df = df.drop("who", axis = 1)
+     df.head()
+survived	pclass	sex	age	sibsp	parch	fare	embarked	class	adult_male	deck	embark_town	alive	alone
+0	0	3	male	22.0	1	0	7.2500	S	Third	True	NaN	Southampton	no	False
+1	1	1	female	38.0	1	0	71.2833	C	First	False	C	Cherbourg	yes	False
+2	1	3	female	26.0	0	0	7.9250	S	Third	False	NaN	Southampton	yes	True
+3	1	1	female	35.0	1	0	53.1000	S	First	False	C	Southampton	yes	False
+4	0	3	male	35.0	0	0	8.0500	S	Third	True	NaN	Southampton	no	True
+
+Görev 13: deck değikenindeki boş değerleri deck değişkenin en çok tekrar eden değeri (mode) ile doldurunuz.
+df["deck"].unique()
+     [NaN, 'C', 'E', 'G', 'D', 'A', 'B', 'F']
+Categories (7, object): ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+
+mode = df["deck"].mode().values[0]
+print(mode)
+     C
+
+df.loc[df["deck"].isna() , 'deck'] = mode
+     df["deck"].unique()
+     ['C', 'E', 'G', 'D', 'A', 'B', 'F']
+Categories (7, object): ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+
+Görev 14: age değişkenindeki boş değerleri age değişkenin medyanı ile doldurunuz.
+median = df["age"].median()
+print(median)
+28.0
+df.loc[df["age"].isna(), 'age'] = median
+df["age"].isnull().sum()
+Out[25]: 0
+
+Görev 15: survived değişkeninin pclass ve cinsiyet değişkenleri kırılımınında sum, count, mean değerlerini bulunuz.
+df.head()
+Out[26]: 
+   survived  pclass     sex   age  ...  deck  embark_town  alive  alone
+0         0       3    male  22.0  ...   NaN  Southampton     no  False
+1         1       1  female  38.0  ...     C    Cherbourg    yes  False
+2         1       3  female  26.0  ...   NaN  Southampton    yes   True
+3         1       1  female  35.0  ...     C  Southampton    yes  False
+4         0       3    male  35.0  ...   NaN  Southampton     no   True
+[5 rows x 14 columns]
+
+df.groupby(["pclass", "sex"]).agg({"survived": ["mean", "sum", "count"]})
+Out[27]: 
+               survived          
+                   mean sum count
+pclass sex                       
+1      female  0.968085  91    94
+       male    0.368852  45   122
+2      female  0.921053  70    76
+       male    0.157407  17   108
+3      female  0.500000  72   144
+       male    0.135447  47   347
+
+Görev 16: 30 yaşın altında olanlar 1, 30'a eşit ve üstünde olanlara 0 vericek bir fonksiyon yazın. Yazdığınız fonksiyonu kullanarak titanik veri setinde age_flag adında bir değişken oluşturunuz oluşturunuz. (apply ve lambda yapılarını kullanınız)
+   df["age_flag"] = df["age"].apply(lambda x: 1 if x < 30 else 0)
+df[["age", "age_flag"]]
+Out[28]: 
+      age  age_flag
+0    22.0         1
+1    38.0         0
+2    26.0         1
+3    35.0         0
+4    35.0         0
+..    ...       ...
+886  27.0         1
+887  19.0         1
+888  28.0         1
+889  26.0         1
+890  32.0         0
+[891 rows x 2 columns]
+
+Görev 17: Seaborn kütüphanesi içerisinden Tips veri setini tanımlayınız.
+df = sns.load_dataset("tips")
+
+Görev 18: Time değişkeninin kategorilerine (Dinner, Lunch) göre total_bill değerlerinin toplamını, min, max ve ortalamasını bulunuz.
+df.columns
+Out[30]: Index(['total_bill', 'tip', 'sex', 'smoker', 'day', 'time', 'size'], dtype='object')
+df["time"].unique()
+Out[31]: 
+['Dinner', 'Lunch']
+Categories (2, object): ['Lunch', 'Dinner']
+df.groupby("time").agg({"total_bill": ["min", "max", "mean"]})
+Out[32]: 
+       total_bill                  
+              min    max       mean
+time                               
+Lunch        7.51  43.11  17.168676
+Dinner       3.07  50.81  20.797159
+
+Görev 19: Günlere ve time göre total_bill değerlerinin toplamını, min, max ve ortalamasını bulunuz.
+df.groupby(["time", "day"]).agg({"total_bill": ["min", "max", "mean", "sum"]})
+Out[35]: 
+            total_bill                           
+                   min    max       mean      sum
+time   day                                       
+Lunch  Thur       7.51  43.11  17.664754  1077.55
+       Fri        8.58  16.27  12.845714    89.92
+       Sat         NaN    NaN        NaN     0.00
+       Sun         NaN    NaN        NaN     0.00
+Dinner Thur      18.78  18.78  18.780000    18.78
+       Fri        5.75  40.17  19.663333   235.96
+       Sat        3.07  50.81  20.441379  1778.40
+       Sun        7.25  48.17  21.410000  1627.16
+
+Görev 20: Lunch zamanına ve kadın müşterilere ait total_bill ve tip değerlerinin day'e göre toplamını, min, max ve ortalamasını bulunuz.
+df.head()
+Out[36]: 
+   total_bill   tip     sex smoker  day    time  size
+0       16.99  1.01  Female     No  Sun  Dinner     2
+1       10.34  1.66    Male     No  Sun  Dinner     3
+2       21.01  3.50    Male     No  Sun  Dinner     3
+3       23.68  3.31    Male     No  Sun  Dinner     2
+4       24.59  3.61  Female     No  Sun  Dinner     4
+
+df.loc[(df.time == "Lunch") & (df.sex == "Female")].groupby("day").agg(
+    {"total_bill": ["mean", "sum", "max", "min"], "tip": ["mean", "sum", "max", "min"]})
+Out[38]: 
+     total_bill                             tip                   
+           mean     sum    max    min      mean    sum   max   min
+day                                                               
+Thur   16.64871  516.11  43.11   8.35  2.561935  79.42  5.17  1.25
+Fri    13.94000   55.76  16.27  10.09  2.745000  10.98  3.48  2.00
+Sat         NaN    0.00    NaN    NaN       NaN   0.00   NaN   NaN
+Sun         NaN    0.00    NaN    NaN       NaN   0.00   NaN   NaN
+
+Görev 21: size'i 3'ten küçük, total_bill'i 10'dan büyük olan siparişlerin ortalaması nedir? (loc kullanınız)
+df.loc[((df["size"] < 3) & (df["total_bill"] > 10)),["total_bill"]].mean()
+
+Görev 22: total_bill_tip_sum adında yeni bir değişken oluşturunuz. Her bir müşterinin ödediği totalbill ve tip in toplamını versin.
+df.head()
+     
+total_bill	tip	sex	smoker	day	time	size
+0	16.99	1.01	Female	No	Sun	Dinner	2
+1	10.34	1.66	Male	No	Sun	Dinner	3
+2	21.01	3.50	Male	No	Sun	Dinner	3
+3	23.68	3.31	Male	No	Sun	Dinner	2
+4	24.59	3.61	Female	No	Sun	Dinner	4
+
+df["total_bill_tip_sum"] = df["total_bill"] + df["tip"]
+     
+
+df.head()
+     
+total_bill	tip	sex	smoker	day	time	size	total_bill_tip_sum
+0	16.99	1.01	Female	No	Sun	Dinner	2	18.00
+1	10.34	1.66	Male	No	Sun	Dinner	3	12.00
+2	21.01	3.50	Male	No	Sun	Dinner	3	24.51
+3	23.68	3.31	Male	No	Sun	Dinner	2	26.99
+4	24.59	3.61	Female	No	Sun	Dinner	4	28.20
+
+Görev 23: total_bill_tip_sum değişkenine göre büyükten küçüğe sıralayınız ve ilk 30 kişiyi yeni bir dataframe'e atayınız.
+new_df = df.sort_values("total_bill_tip_sum", ascending = False).head(30)
+     
+
+new_df
+     
+total_bill	tip	sex	smoker	day	time	size	total_bill_tip_sum
+170	50.81	10.00	Male	Yes	Sat	Dinner	3	60.81
+212	48.33	9.00	Male	No	Sat	Dinner	4	57.33
+59	48.27	6.73	Male	No	Sat	Dinner	4	55.00
+156	48.17	5.00	Male	No	Sun	Dinner	6	53.17
+182	45.35	3.50	Male	Yes	Sun	Dinner	3	48.85
+197	43.11	5.00	Female	Yes	Thur	Lunch	4	48.11
+23	39.42	7.58	Male	No	Sat	Dinner	4	47.00
+102	44.30	2.50	Female	Yes	Sat	Dinner	3	46.80
+142	41.19	5.00	Male	No	Thur	Lunch	5	46.19
+95	40.17	4.73	Male	Yes	Fri	Dinner	4	44.90
+184	40.55	3.00	Male	Yes	Sun	Dinner	2	43.55
+112	38.07	4.00	Male	No	Sun	Dinner	3	42.07
+207	38.73	3.00	Male	Yes	Sat	Dinner	4	41.73
+56	38.01	3.00	Male	Yes	Sat	Dinner	4	41.01
+141	34.30	6.70	Male	No	Thur	Lunch	6	41.00
+238	35.83	4.67	Female	No	Sat	Dinner	3	40.50
+11	35.26	5.00	Female	No	Sun	Dinner	4	40.26
+52	34.81	5.20	Female	No	Sun	Dinner	4	40.01
+85	34.83	5.17	Female	No	Thur	Lunch	4	40.00
+47	32.40	6.00	Male	No	Sun	Dinner	4	38.40
+180	34.65	3.68	Male	Yes	Sun	Dinner	4	38.33
+179	34.63	3.55	Male	Yes	Sun	Dinner	2	38.18
+83	32.68	5.00	Male	Yes	Thur	Lunch	2	37.68
+39	31.27	5.00	Male	No	Sat	Dinner	3	36.27
+167	31.71	4.50	Male	No	Sun	Dinner	4	36.21
+175	32.90	3.11	Male	Yes	Sun	Dinner	2	36.01
+44	30.40	5.60	Male	No	Sun	Dinner	4	36.00
+173	31.85	3.18	Male	Yes	Sun	Dinner	2	35.03
+116	29.93	5.07	Male	No	Sun	Dinner	4	35.00
+155	29.85	5.14	Female	No	Sun	Dinner	5	34.99
